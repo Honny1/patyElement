@@ -37,14 +37,45 @@ const byte tT[8]= {100,0,0,0,0,0,0,0}; //period <1;256>xtic ms
 #define Col8 13 //i r
 
 #define messageLen 4
-                          //      A           H           O           J
+                            //      A           H           O           J
 int message[messageLen][2]={{ROW0,Col0},{ROW0,Col7},{ROW1,Col5},{ROW1,Col0}};
+
+#define messageLen1 27
+int message1[messageLen1][2]={
+  {ROW0,Col0}, //a
+  {ROW0,Col1}, //b
+  {ROW0,Col2}, //c
+  {ROW0,Col3}, //d
+  {ROW0,Col4}, //e
+  {ROW0,Col5}, //f
+  {ROW0,Col6}, //g
+  {ROW0,Col7}, //h
+  {ROW0,Col8}, //i
+  {ROW1,Col0}, //j
+  {ROW1,Col1}, //k
+  {ROW1,Col2}, //l
+  {ROW1,Col3}, //m
+  {ROW1,Col4}, //n
+  {ROW1,Col5}, //o
+  {ROW1,Col6}, //p
+  {ROW1,Col7}, //q
+  {ROW1,Col8}, //r
+  {ROW2,Col0}, //s
+  {ROW2,Col1}, //t
+  {ROW2,Col2}, //u
+  {ROW2,Col3}, //v
+  {ROW2,Col4}, //w
+  {ROW2,Col5}, //x
+  {ROW2,Col6}, //y
+  {ROW2,Col7}, //z
+  };
 
 int couterTime = 0;
 int i = 0;
 bool connectionOK = false;
 int dockNum = 0;
 int stoneNum = 2;
+bool test = true;
 /*-----------------------------------*/
 void setup() {
 /**************************************
@@ -65,20 +96,36 @@ Serial.println("run");
 ********U S E R   C O D E**************/
 void task0() {
   if(connectionOK){
-    if(couterTime==10){
-      setRow(message[i][0]);
-      offOn(message[i][1]);
-    }else if(couterTime==20){
-      offOn(message[i][1]);
-      couterTime=0;
-      i++;
-      if(i > messageLen){
-        i=0;
+    if(test){
+      //Display alfabet
+      if(couterTime==10){
+        setRow(message1[i][0]);
+        offOn(message1[i][1]);
+      }else if(couterTime==20){
+        offOn(message1[i][1]);
+        couterTime=0;
+        i++;
+        if(i > messageLen1){
+          i=0;
+          test=false;
+        }
       }
+    }else{
+      //Display message
+      if(couterTime==10){
+        setRow(message[i][0]);
+        offOn(message[i][1]);
+      }else if(couterTime==20){
+        offOn(message[i][1]);
+        couterTime=0;
+        i++;
+        if(i > messageLen){
+          i=0;
+        }
+      }      
     }
     couterTime++;
-  }
-  
+  } 
 } 
 void task1() {
 }
