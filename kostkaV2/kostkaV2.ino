@@ -15,67 +15,71 @@ rtOS TT(1);    //construct rtOS tic(1ms)
      tT- period for schedule of task
 ***************************************/
 const byte dT[8]= {1,0,0,0,0,0,0,0}; //start delay <1;255>xtic ms
-const byte tT[8]= {100,0,0,0,0,0,0,0}; //period <1;256>xtic ms
+const byte tT[8]= {50,0,0,0,0,0,0,0}; //period <1;256>xtic ms
 /**************************************
  User global definitions:
      - constants
      - variables
 *******D E C L A R A T I O N s*********/
-#define ROW0 9
-#define ROW1 10
-#define ROW2 11
+#define COL0 9
+#define COL1 10
+#define COL2 11
 
                 //0 1 2
-#define Col0 2  //a j s
-#define Col1 3  //b k t
-#define Col2 4  //c l u
-#define Col3 5  //d m v
-#define Col4 6  //e n w
-#define Col5 7  //f o x
-#define Col6 8  //g p y
-#define Col7 12 //h q z
-#define Col8 13 //i r
+#define Row0 2  //a j s
+#define Row1 3  //b k t
+#define Row2 4  //c l u
+#define Row3 5  //d m v
+#define Row4 6  //e n w
+#define Row5 7  //f o x
+#define Row6 8  //g p y
+#define Row7 12 //h q z
+#define Row8 13 //i r
 
 #define messageLen 4
                             //      A           H           O           J
-int message[messageLen][2]={{ROW0,Col0},{ROW0,Col7},{ROW1,Col5},{ROW1,Col0}};
+int message[messageLen][2]={{COL0,Row0},{COL0,Row7},{COL1,Row5},{COL1,Row0}};
 
 #define messageLen1 27
 int message1[messageLen1][2]={
-  {ROW0,Col0}, //a
-  {ROW0,Col1}, //b
-  {ROW0,Col2}, //c
-  {ROW0,Col3}, //d
-  {ROW0,Col4}, //e
-  {ROW0,Col5}, //f
-  {ROW0,Col6}, //g
-  {ROW0,Col7}, //h
-  {ROW0,Col8}, //i
-  {ROW1,Col0}, //j
-  {ROW1,Col1}, //k
-  {ROW1,Col2}, //l
-  {ROW1,Col3}, //m
-  {ROW1,Col4}, //n
-  {ROW1,Col5}, //o
-  {ROW1,Col6}, //p
-  {ROW1,Col7}, //q
-  {ROW1,Col8}, //r
-  {ROW2,Col0}, //s
-  {ROW2,Col1}, //t
-  {ROW2,Col2}, //u
-  {ROW2,Col3}, //v
-  {ROW2,Col4}, //w
-  {ROW2,Col5}, //x
-  {ROW2,Col6}, //y
-  {ROW2,Col7}, //z
+  {COL0,Row0}, //a
+  {COL0,Row1}, //b
+  {COL0,Row2}, //c
+  {COL0,Row3}, //d
+  {COL0,Row4}, //e
+  {COL0,Row5}, //f
+  {COL0,Row6}, //g
+  {COL0,Row7}, //h
+  {COL0,Row8}, //i
+  {COL1,Row0}, //j
+  {COL1,Row1}, //k
+  {COL1,Row2}, //l
+  {COL1,Row3}, //m
+  {COL1,Row4}, //n
+  {COL1,Row5}, //o
+  {COL1,Row6}, //p
+  {COL1,Row7}, //q
+  {COL1,Row8}, //r
+  {COL2,Row0}, //s
+  {COL2,Row1}, //t
+  {COL2,Row2}, //u
+  {COL2,Row3}, //v
+  {COL2,Row4}, //w
+  {COL2,Row5}, //x
+  {COL2,Row6}, //y
+  {COL2,Row7}, //z
   };
+
+int ledsInCol[9]={Row0,Row1,Row2,Row3,Row4,Row5,Row6,Row7,Row8};
 
 int couterTime = 0;
 int i = 0;
 bool connectionOK = false;
 int dockNum = 0;
 int stoneNum = 2;
-bool test = true;
+int Mode=0;
+bool reverseMode = false;
+
 /*-----------------------------------*/
 void setup() {
 /**************************************
@@ -88,7 +92,9 @@ for (int thisPin = 2; thisPin < 14; thisPin++) {
 Wire.begin(0x02); 
 Wire.onReceive(comunicationI2C);
 Serial.println("run");
-
+//invertMode
+off();
+//on();
 /*------------------------------------*/
   TT.start(); } //start rtOS
 /*   PROCEDURES SPACE
@@ -96,33 +102,62 @@ Serial.println("run");
 ********U S E R   C O D E**************/
 void task0() {
   if(connectionOK){
-    if(test){
-      //Display alfabet
-      if(couterTime==10){
-        setRow(message1[i][0]);
-        offOn(message1[i][1]);
-      }else if(couterTime==20){
-        offOn(message1[i][1]);
-        couterTime=0;
-        i++;
-        if(i > messageLen1){
-          i=0;
-          test=false;
-        }
-      }
-    }else{
-      //Display message
-      if(couterTime==10){
-        setRow(message[i][0]);
-        offOn(message[i][1]);
-      }else if(couterTime==20){
-        offOn(message[i][1]);
-        couterTime=0;
-        i++;
-        if(i > messageLen){
-          i=0;
-        }
-      }      
+
+    switch (Mode) {
+        case 1:
+          //Display alfabet
+          if(couterTime==1){
+            setCol(message1[i][0]);
+            offOn(message1[i][1]);
+          }else if(couterTime==10){
+            offOn(message1[i][1]);
+            couterTime=0;
+            i++;
+            if(i == messageLen1){
+              i=0;
+              Mode=2;
+            }
+          }
+          break;
+        case 2:
+          //Display message
+          if(couterTime==20){
+            setCol(message[i][0]);
+            offOn(message[i][1]);
+         }else if(couterTime==40){
+            offOn(message[i][1]);
+            couterTime=0;
+            i++;
+            if(i == messageLen){
+              i=0; 
+            }
+          }  
+          break;
+        default:
+          //animation
+          if(couterTime==0){
+            setCol(3);
+            offOn(ledsInCol[i]);
+          }else if(couterTime==1){
+            offOn(ledsInCol[i]);
+            couterTime=0;
+            
+            if(reverseMode){
+                i--;
+            }else{
+                i++;
+            }
+            
+            if(i == 9){
+              reverseMode = true;
+            }
+            
+            if(i==0){
+              Mode=1;
+              reverseMode = false;
+            }
+          }
+          break;
     }
     couterTime++;
   } 
@@ -144,26 +179,47 @@ void task7() {
 /*************************************
 ******User S U B R O U T I N E s******/
 
-void setRow(int pin){
+void setCol(int pin){
   switch (pin) {
-    case ROW0:
-      digitalWrite(ROW0, LOW);    
-      digitalWrite(ROW1, HIGH);
-      digitalWrite(ROW2, HIGH);
+    case COL0:
+      digitalWrite(COL0, LOW);    
+      digitalWrite(COL1, HIGH);
+      digitalWrite(COL2, HIGH);
       break;
-    case ROW1:
-      digitalWrite(ROW0, HIGH);    
-      digitalWrite(ROW1, LOW);
-      digitalWrite(ROW2, HIGH);
+    case COL1:
+      digitalWrite(COL0, HIGH);    
+      digitalWrite(COL1, LOW);
+      digitalWrite(COL2, HIGH);
       break;
-    case ROW2:
-      digitalWrite(ROW0, HIGH);    
-      digitalWrite(ROW1, HIGH);
-      digitalWrite(ROW2, LOW);
+    case COL2:
+      digitalWrite(COL0, HIGH);    
+      digitalWrite(COL1, HIGH);
+      digitalWrite(COL2, LOW);
       break;
+    default:
+      digitalWrite(COL0, LOW);    
+      digitalWrite(COL1, LOW);
+      digitalWrite(COL2, LOW);
+      break;
+    
   }
 }
 
+void off(){
+  setCol(3);
+  for (int thisPin = 0; thisPin < 9; thisPin++) {
+    digitalWrite(ledsInCol[thisPin], LOW);
+  }  
+}
+
+
+void on(){
+  setCol(3);
+  for (int thisPin = 0; thisPin < 9; thisPin++) {
+    digitalWrite(ledsInCol[thisPin], HIGH);
+  }  
+}
+  
 void offOn(int pin){
   digitalWrite(pin, !digitalRead(pin));
 }
