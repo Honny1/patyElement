@@ -8,22 +8,67 @@ Libraries.........................
 ***************************************/
 #include "rtOS.h"
 #include <Wire.h>
+#include <Keypad.h>
 /*------------------------------------*/
 rtOS TT(1);    //construct rtOS tic(1ms)
 /**************************************
      dT- delay start for task
      tT- period for schedule of task
 ***************************************/
-const byte dT[8]= {1,0,0,0,0,0,0,0}; //start delay <1;255>xtic ms
-const byte tT[8]= {100,0,0,0,0,0,0,0}; //period <1;256>xtic ms
+const byte dT[8]= {1,2,0,0,0,0,0,0}; //start delay <1;255>xtic ms
+const byte tT[8]= {50,1,0,0,0,0,0,0}; //period <1;256>xtic ms
 /**************************************
  User global definitions:
      - constants
      - variables
 *******D E C L A R A T I O N s*********/
-int dockNum=2;
+#define Password_Lenght 5
+char Data[Password_Lenght]; 
+char Master[Password_Lenght] = "1234"; 
+byte data_count = 0, master_count = 0;
+bool Pass_is_good;
+char customKey;
+
+const byte ROWS = 4; 
+const byte COLS = 3; 
+
+char hexaKeys[ROWS][COLS] = {
+  {'1', '2', '3'},
+  {'4', '5', '6'},
+  {'7', '8', '9'},
+  {'*', '0', '#'}
+};
 
 
+   //pins on keypad - 2,7,6,4
+byte rowPins[ROWS] = {3,8,7,5}; 
+   //pins on keypad - 3, 1, 5
+byte colPins[COLS] = {4, 2, 6};
+
+
+Keypad customKeypad = Keypad(makeKeymap(hexaKeys), rowPins, colPins, ROWS, COLS); 
+
+char dataCode='4';
+/*
+ * DATA
+ * voda - 1
+ * lightOn - A 
+ * show pass - B
+ * 
+ * ohen - 2
+ * lightOn - C
+ * show pass - D
+ * 
+ * vyduch - 3
+ * lightOn - E
+ * show pass - F
+ * 
+ * zeme - 4 
+ * lightOn - G 
+ * show pass - H
+ */
+ 
+bool showPass = false;
 
 /*-----------------------------------*/
 void setup() {
@@ -31,23 +76,36 @@ void setup() {
      Setup for user Tasks
 *************S E T U P****************/
 Serial.begin(9600);
-Wire.begin(0x01);
 
 Serial.println("run");
-
+Wire.begin(8);               
+Wire.onRequest(requestEvent);
 /*------------------------------------*/
   TT.start(); } //start rtOS
 /*   PROCEDURES SPACE
      task0 ... task7
 ********U S E R   C O D E**************/
 void task0() {
-   Serial.print("send: ");
-   Serial.println(dockNum);
-   Wire.beginTransmission(0x02);
-   Wire.write(dockNum);
-   Wire.endTransmission();
+  customKey = customKeypad.getKey();
+  if (customKey){
+    Data[data_count] = customKey; 
+    data_count++;
+    if(customKey=='*'){
+      clearData();   
+      } 
+  }
+
+  if(data_count == Password_Lenght-1){
+    if(!strcmp(Data, Master)){
+     dataCode='G'; 
+    }
+    clearData();   
+  }
 } 
 void task1() {
+  if(showPass){
+    dataCode='H';
+    }
 }
 void task2() {
 }
@@ -63,10 +121,16 @@ void task7() {
 }
 /*************************************
 ******User S U B R O U T I N E s******/
+void requestEvent() {
+  Wire.write(dataCode); 
+}
 
-
-
-
+void clearData(){
+  while(data_count !=0){    
+    Data[data_count--] = 0;
+  }
+  return;
+}
 
 /*************************************
      SUPER LOOP (dispatcher)

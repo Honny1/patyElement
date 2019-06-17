@@ -14,8 +14,8 @@ rtOS TT(1);    //construct rtOS tic(1ms)
      dT- delay start for task
      tT- period for schedule of task
 ***************************************/
-const byte dT[8]= {1,0,0,0,0,0,0,0}; //start delay <1;255>xtic ms
-const byte tT[8]= {16,0,0,0,0,0,0,0}; //period <1;256>xtic ms
+const byte dT[8]= {1,10,0,0,0,0,0,0}; //start delay <1;255>xtic ms
+const byte tT[8]= {16,123,0,0,0,0,0,0}; //period <1;256>xtic ms
 /**************************************
  User global definitions:
      - constants
@@ -23,8 +23,8 @@ const byte tT[8]= {16,0,0,0,0,0,0,0}; //period <1;256>xtic ms
 *******D E C L A R A T I O N s*********/
 int ROW_PINS[] = {2,3,4,5,6,7,8,12,13};
 int COL_PINS[] = {9,10,11};
-                  // ABC  DEF  GHI  JKL  MNO  PQR  STU  VWX  YZ
-byte PATTERN[3][9]={{B011,B111,B101,B011,B110,B111,B111,B111,B101},
+                   // ABC  DEF  GHI  JKL  MNO  PQR  STU  VWX  YZ
+byte PATTERN[3][9]={{B011,B111,B101,B011,B110,B111,B111,B111,B111},
                    {B111,B111,B111,B111,B111,B111,B111,B111,B111},
                    {B000,B000,B000,B000,B000,B000,B000,B000,B000},
                    };
@@ -55,14 +55,25 @@ bool lightOn = false;
 bool showPass = false;
 int data = 0;
 int stoneNum = 4;
+char lightOnCode='G';
+char showPassCode='H';
 /*
  * DATA
  * voda - 1
+ * lightOn - A 
+ * show pass - B
+ * 
  * ohen - 2
- * vyduch -3
- * zeme - 4
- * lighOn - 5 
- * show pass - 6
+ * lightOn - C
+ * show pass - D
+ * 
+ * vyduch - 3
+ * lightOn - E
+ * show pass - F
+ * 
+ * zeme - 4 
+ * lightOn - G 
+ * show pass - H
  */
 
 /*-----------------------------------*/
@@ -74,8 +85,7 @@ Serial.begin(9600);
 for (int thisPin = 2; thisPin < 14; thisPin++) {
     pinMode(thisPin, OUTPUT);
 }
-Wire.begin(0x02); 
-Wire.onReceive(comunicationI2C);
+Wire.begin(); 
 Serial.println("run");
 
 /*------------------------------------*/
@@ -86,7 +96,7 @@ Serial.println("run");
 void task0() {
   if(connectionOK){
       connectionOK= true;
-      Serial.println("Good dock");
+      //Serial.println("Good dock");
       if (lightOn){
         if(runAnimation){
           animation(ANIMATION_PATTERN_DELAY);
@@ -106,6 +116,11 @@ void task0() {
 } 
 
 void task1() {
+  Wire.requestFrom(8, 1);
+  while (Wire.available()) { 
+    comunicationI2C();
+  }
+
 }
 void task2() {
 }
@@ -157,22 +172,25 @@ void animation(int pD){
    }
 }
 }
-void comunicationI2C(int len) {
-  Serial.print("connect: ");
+void comunicationI2C() {
+  //Serial.print("connect: ");
   data = Wire.read();
   if(data==stoneNum){
       connectionOK= true;
-      Serial.println("Good dock");
-    }else if(data == 5){
-      Serial.println("lightON");
+      //Serial.println("Good dock");
+    }else if(data == lightOnCode){
+      //Serial.println("lightON");
+      connectionOK= true;
       lightOn = true;
-   }else if(data == 6){
-      Serial.println("show pass");
+   }else if(data == showPassCode){
+      //Serial.println("show pass");
+      connectionOK= true;
       showPass = true;
    }else{
       connectionOK = false;
-      Serial.println("bad dock");
+      //Serial.println("bad dock");
     }
+   data=0;
 }
 
 /*************************************
