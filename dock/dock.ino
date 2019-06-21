@@ -1,7 +1,7 @@
 /**************************************
  rtOS APPLICATION MutiFunction Shield
 ***************************************
-Name:     rtOS_core
+Name:     DOCK
 Version:  v1.0     
 Libraries.........................
   rtOS.h
@@ -22,12 +22,35 @@ const byte tT[8]= {50,1,0,0,0,0,0,0}; //period <1;256>xtic ms
      - constants
      - variables
 *******D E C L A R A T I O N s*********/
+#define KEY 1
+#define SENZOR 2
+
+
 #define Password_Lenght 5
 char Data[Password_Lenght]; 
 char Master[Password_Lenght] = "1234"; 
 byte data_count = 0, master_count = 0;
 bool Pass_is_good;
 char customKey;
+
+/*
+ * UP - 1
+ * DOWN - 2
+ * LEFT - 3
+ * RIGHT - 4
+ */
+#define buttonUP 3
+#define buttonDOWN 4
+#define buttonLEFT 5
+#define buttonRIGHT 6
+
+#define Button_Password_Lenght 5
+char Button_Data[Button_Password_Lenght]; 
+char Button_Master[Button_Password_Lenght] = "1432"; 
+byte button_data_count = 0, button_master_count = 0;
+bool Button_Pass_is_good;
+char buttonCustomKey;
+
 
 const byte ROWS = 4; 
 const byte COLS = 3; 
@@ -69,7 +92,9 @@ char dataCode='4';
  */
  
 bool showPass = false;
-
+bool openSenzor = false;
+bool openKey = true;
+bool senzor = false;
 /*-----------------------------------*/
 void setup() {
 /**************************************
@@ -80,12 +105,17 @@ Serial.begin(9600);
 Serial.println("run");
 Wire.begin(8);               
 Wire.onRequest(requestEvent);
+pinMode(buttonUP, INPUT);
+pinMode(buttonDOWN, INPUT);
+pinMode(buttonRIGHT, INPUT);
+pinMode(buttonLEFT, INPUT);
 /*------------------------------------*/
   TT.start(); } //start rtOS
 /*   PROCEDURES SPACE
      task0 ... task7
 ********U S E R   C O D E**************/
 void task0() {
+  if(openKey){
   customKey = customKeypad.getKey();
   if (customKey){
     Data[data_count] = customKey; 
@@ -97,9 +127,13 @@ void task0() {
 
   if(data_count == Password_Lenght-1){
     if(!strcmp(Data, Master)){
-     dataCode='G'; 
+     dataCode='G';
+     openKey=false;
+     openSenzor=true;
+     sevoOpen(KEY); 
     }
     clearData();   
+  }
   }
 } 
 void task1() {
@@ -108,6 +142,22 @@ void task1() {
     }
 }
 void task2() {
+  // RESET input 
+  if (openSenzor){
+    buttonCustomKey = readButtons();
+    if (buttonCustomKey!='9'){
+      Button_Data[button_data_count] = buttonCustomKey; 
+      button_data_count++;
+    }
+    if(button_data_count == Button_Password_Lenght-1){
+      if(!strcmp(Button_Data, Button_Master)){
+        senzor=true;
+        openSenzor=false; 
+        sevoOpen(SENZOR);
+        }
+        buttonClearData();   
+      }
+    }
 }
 void task3() {
 }
@@ -132,6 +182,26 @@ void clearData(){
   return;
 }
 
+void buttonClearData(){
+  while(button_data_count !=0){    
+    Button_Data[button_data_count--] = 0;
+  }
+  return;
+}
+
+char readButtons(){
+  if (digitalRead(buttonUP) == HIGH) {return '1';
+  } else if (digitalRead(buttonDOWN) == HIGH) { return '2';
+  } else if (digitalRead(buttonRIGHT) == HIGH) { return '4';
+  } else if (digitalRead(buttonLEFT) == HIGH) {return '3';
+  }else{return '9';}
+}
+
+
+void sevoOpen(int data){
+  //todo - open servo by data
+  return;
+}
 /*************************************
      SUPER LOOP (dispatcher)
 ****   never modify(!!!)   ***********/
