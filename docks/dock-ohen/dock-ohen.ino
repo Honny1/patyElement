@@ -38,6 +38,8 @@ const int pinCidlaDS = 4;
 OneWire oneWireDS(pinCidlaDS);
 DallasTemperature senzoryDS(&oneWireDS);
 
+#define pinSwitches A3
+
 #define Password_Lenght 5
 char Data[Password_Lenght]; 
 char Master[Password_Lenght] = "5742"; 
@@ -102,6 +104,7 @@ keyServo.attach(keyServoPin);
 senzorServo.attach(senzorServoPin);
 sevoOpen(0);
 senzoryDS.begin();
+pinMode(pinSwitches, INPUT);
 /*------------------------------------*/
   TT.start(); } //start rtOS
 /*   PROCEDURES SPACE
@@ -141,11 +144,12 @@ void task1() {
 }
 void task2() {
   if (openSenzor){
+    if (analogRead(pinSwitches) > 500 and analogRead(pinSwitches) < 800 ){
         senzor=true;
         openSenzor=false; 
         sevoOpen(SENZOR);     
+        }
       }
-    
 }
 void task3() {
   if (senzor){
