@@ -172,6 +172,7 @@ void animation(int pD){
    }
 }
 }
+
 void comunicationI2C() {
   //Serial.print("connect: ");
   data = Wire.read();
@@ -182,9 +183,11 @@ void comunicationI2C() {
       //Serial.println("lightON");
       connectionOK= true;
       lightOn = true;
+      showPass = false;
    }else if(data == showPassCode){
       //Serial.println("show pass");
       connectionOK= true;
+      lightOn = false;
       showPass = true;
    }else{
       connectionOK = false;

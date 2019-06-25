@@ -173,6 +173,7 @@ void animation(int pD){
    }
 }
 }
+
 void comunicationI2C() {
   //Serial.print("connect: ");
   data = Wire.read();
@@ -182,11 +183,13 @@ void comunicationI2C() {
     }else if(data == lightOnCode){
       //Serial.println("lightON");
       connectionOK= true;
+      showPass = false;
       lightOn = true;
    }else if(data == showPassCode){
       //Serial.println("show pass");
       connectionOK= true;
       showPass = true;
+      lightOn = false;
    }else{
       connectionOK = false;
       //Serial.println("bad dock");
