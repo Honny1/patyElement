@@ -1,7 +1,7 @@
 /**************************************
- rtOS APPLICATION MutiFunction Shield
+ rtOS
 ***************************************
-Name:     DOCK
+Name:     DOCK-ohen
 Version:  v1.0     
 Libraries.........................
   rtOS.h
@@ -10,7 +10,8 @@ Libraries.........................
 #include <Wire.h>
 #include <Keypad.h>
 #include <Servo.h>  
-#include <HMC5983.h>
+#include <OneWire.h>
+#include <DallasTemperature.h>
 /*------------------------------------*/
 rtOS TT(1);    //construct rtOS tic(1ms)
 /**************************************
@@ -33,7 +34,9 @@ const byte tT[8]= {50,1,50,100,0,0,0,0}; //period <1;256>xtic ms
 Servo keyServo;
 Servo senzorServo;
 
-HMC5983 compass;
+const int pinCidlaDS = 4;
+OneWire oneWireDS(pinCidlaDS);
+DallasTemperature senzoryDS(&oneWireDS);
 
 #define Password_Lenght 5
 char Data[Password_Lenght]; 
@@ -41,25 +44,6 @@ char Master[Password_Lenght] = "1234";
 byte data_count = 0, master_count = 0;
 bool Pass_is_good;
 char customKey;
-
-/*
- * UP - 1
- * DOWN - 2
- * LEFT - 3
- * RIGHT - 4
- */
-#define buttonUP 12
-#define buttonDOWN 13
-#define buttonLEFT A1
-#define buttonRIGHT A2
-
-#define Button_Password_Lenght 5
-char Button_Data[Button_Password_Lenght]; 
-char Button_Master[Button_Password_Lenght] = "1432"; 
-byte button_data_count = 0, button_master_count = 0;
-bool Button_Pass_is_good;
-char buttonCustomKey;
-
 
 const byte ROWS = 4; 
 const byte COLS = 3; 
@@ -75,12 +59,12 @@ char hexaKeys[ROWS][COLS] = {
    //pins on keypad - 2,7,6,4
 byte rowPins[ROWS] = {3,8,7,5}; 
    //pins on keypad - 3, 1, 5
-byte colPins[COLS] = {4, 2, 6};
+byte colPins[COLS] = {13, 2, 6};
 
 
 Keypad customKeypad = Keypad(makeKeymap(hexaKeys), rowPins, colPins, ROWS, COLS); 
 
-char dataCode='4';
+char dataCode='2';
 /*
  * DATA
  * voda - 1
@@ -114,14 +98,10 @@ Serial.begin(9600);
 Serial.println("run");
 Wire.begin(8);               
 Wire.onRequest(requestEvent);
-pinMode(buttonUP, INPUT);
-pinMode(buttonDOWN, INPUT);
-pinMode(buttonRIGHT, INPUT);
-pinMode(buttonLEFT, INPUT);
 keyServo.attach(keyServoPin);
 senzorServo.attach(senzorServoPin);
 sevoOpen(0);
-compass.begin();
+senzoryDS.begin();
 /*------------------------------------*/
   TT.start(); } //start rtOS
 /*   PROCEDURES SPACE
@@ -140,7 +120,7 @@ void task0() {
 
   if(data_count == Password_Lenght-1){
     if(!strcmp(Data, Master)){
-     dataCode='G';
+     dataCode='C';
      openKey=false;
      openSenzor=true;
      sevoOpen(KEY); 
@@ -151,42 +131,26 @@ void task0() {
 } 
 void task1() {
   if(showPass){
-    dataCode = 'H';
+    dataCode = 'D';
     }else{
       dataCode=dataCode;
-      if(dataCode=='H'){
-          dataCode='G';
+      if(dataCode=='D'){
+          dataCode='C';
         }
       }
 }
 void task2() {
-  // RESET input - doresit 
-  customKey = customKeypad.getKey();
-  if(customKey=='*'){
-      clearData(); 
-      buttonClearData();   
-      } 
   if (openSenzor){
-    buttonCustomKey = readButtons();
-    if (buttonCustomKey!='9'){
-      Button_Data[button_data_count] = buttonCustomKey; 
-      button_data_count++;
-    }
-    if(button_data_count == Button_Password_Lenght-1){
-      if(!strcmp(Button_Data, Button_Master)){
         senzor=true;
         openSenzor=false; 
-        sevoOpen(SENZOR);
-        }
-        buttonClearData();   
+        sevoOpen(SENZOR);     
       }
-    }
+    
 }
 void task3() {
   if (senzor){
-    int c = -999;
-    c = compass.read();
-    if (c > 90 and c < 120) {
+    senzoryDS.requestTemperatures();
+    if ((int)senzoryDS.getTempCByIndex(0) > 50) {
       showPass=true;
       }else{
         showPass=false;
@@ -213,22 +177,6 @@ void clearData(){
   }
   return;
 }
-
-void buttonClearData(){
-  while(button_data_count !=0){    
-    Button_Data[button_data_count--] = 0;
-  }
-  return;
-}
-
-char readButtons(){
-  if (digitalRead(buttonUP) == HIGH) {return '1';
-  } else if (digitalRead(buttonDOWN) == HIGH) { return '2';
-  } else if (digitalRead(buttonRIGHT) == HIGH) { return '4';
-  } else if (digitalRead(buttonLEFT) == HIGH) {return '3';
-  }else{return '9';}
-}
-
 
 void sevoOpen(int data){
     switch (data) {

@@ -1,7 +1,7 @@
 /**************************************
- rtOS APPLICATION MutiFunction Shield
+ rtOS 
 ***************************************
-Name:     DOCK
+Name:     DOCK-vzduch
 Version:  v1.0     
 Libraries.........................
   rtOS.h
@@ -10,7 +10,6 @@ Libraries.........................
 #include <Wire.h>
 #include <Keypad.h>
 #include <Servo.h>  
-#include <HMC5983.h>
 /*------------------------------------*/
 rtOS TT(1);    //construct rtOS tic(1ms)
 /**************************************
@@ -33,7 +32,22 @@ const byte tT[8]= {50,1,50,100,0,0,0,0}; //period <1;256>xtic ms
 Servo keyServo;
 Servo senzorServo;
 
-HMC5983 compass;
+#define pinPrutokomer 2
+#define pinPreruseni 0
+volatile byte pocetPulzu = 0;
+
+#define pinCLK 8
+#define pinDT  9
+#define pinSW  10
+float poziceEnkod = 0;
+int stavPred;
+int stavCLK;
+int stavSW;
+String pass = "";
+int lenPass=0;
+int presed=0;
+
+const int buzzer = 5;
 
 #define Password_Lenght 5
 char Data[Password_Lenght]; 
@@ -41,24 +55,6 @@ char Master[Password_Lenght] = "1234";
 byte data_count = 0, master_count = 0;
 bool Pass_is_good;
 char customKey;
-
-/*
- * UP - 1
- * DOWN - 2
- * LEFT - 3
- * RIGHT - 4
- */
-#define buttonUP 12
-#define buttonDOWN 13
-#define buttonLEFT A1
-#define buttonRIGHT A2
-
-#define Button_Password_Lenght 5
-char Button_Data[Button_Password_Lenght]; 
-char Button_Master[Button_Password_Lenght] = "1432"; 
-byte button_data_count = 0, button_master_count = 0;
-bool Button_Pass_is_good;
-char buttonCustomKey;
 
 
 const byte ROWS = 4; 
@@ -73,14 +69,14 @@ char hexaKeys[ROWS][COLS] = {
 
 
    //pins on keypad - 2,7,6,4
-byte rowPins[ROWS] = {3,8,7,5}; 
+byte rowPins[ROWS] = {3,8,7,11}; 
    //pins on keypad - 3, 1, 5
-byte colPins[COLS] = {4, 2, 6};
+byte colPins[COLS] = {4, 12, 6};
 
 
 Keypad customKeypad = Keypad(makeKeymap(hexaKeys), rowPins, colPins, ROWS, COLS); 
 
-char dataCode='4';
+char dataCode='3';
 /*
  * DATA
  * voda - 1
@@ -104,6 +100,8 @@ bool showPass = false;
 bool openSenzor = false;
 bool openKey = true;
 bool senzor = false;
+int counterTone=0;
+int counterTone1=0;
 /*-----------------------------------*/
 void setup() {
 /**************************************
@@ -114,14 +112,15 @@ Serial.begin(9600);
 Serial.println("run");
 Wire.begin(8);               
 Wire.onRequest(requestEvent);
-pinMode(buttonUP, INPUT);
-pinMode(buttonDOWN, INPUT);
-pinMode(buttonRIGHT, INPUT);
-pinMode(buttonLEFT, INPUT);
 keyServo.attach(keyServoPin);
 senzorServo.attach(senzorServoPin);
 sevoOpen(0);
-compass.begin();
+pinMode(pinPrutokomer, INPUT);
+attachInterrupt(pinPreruseni, prictiPulz, FALLING);
+pinMode(pinCLK, INPUT);
+pinMode(pinDT, INPUT);
+pinMode(pinSW, INPUT_PULLUP);
+pinMode(buzzer, OUTPUT); 
 /*------------------------------------*/
   TT.start(); } //start rtOS
 /*   PROCEDURES SPACE
@@ -140,7 +139,7 @@ void task0() {
 
   if(data_count == Password_Lenght-1){
     if(!strcmp(Data, Master)){
-     dataCode='G';
+     dataCode='E';
      openKey=false;
      openSenzor=true;
      sevoOpen(KEY); 
@@ -151,46 +150,84 @@ void task0() {
 } 
 void task1() {
   if(showPass){
-    dataCode = 'H';
+    dataCode = 'F';
     }else{
       dataCode=dataCode;
-      if(dataCode=='H'){
-          dataCode='G';
+      if(dataCode=='F'){
+          dataCode='E';
         }
       }
 }
 void task2() {
-  // RESET input - doresit 
-  customKey = customKeypad.getKey();
-  if(customKey=='*'){
-      clearData(); 
-      buttonClearData();   
-      } 
   if (openSenzor){
-    buttonCustomKey = readButtons();
-    if (buttonCustomKey!='9'){
-      Button_Data[button_data_count] = buttonCustomKey; 
-      button_data_count++;
+    stavCLK = digitalRead(pinCLK);
+    if (stavCLK != stavPred) {
+      if (digitalRead(pinDT) != stavCLK) {
+        poziceEnkod=poziceEnkod+0.5;
+        counterTone++;
+        if (counterTone==1){
+          tone(buzzer, 1000); 
+          delay(500);       
+          noTone(buzzer);
+          counterTone=0; 
+          }
+        if(poziceEnkod>=9){poziceEnkod=0;}
+      }else{
+        poziceEnkod=poziceEnkod-0.5;
+        counterTone1++;
+        if (counterTone1==1){
+          tone(buzzer, 500); 
+          delay(500);       
+          noTone(buzzer);
+          counterTone1=0; 
+          }
+        if(poziceEnkod<0){poziceEnkod=9;}
+      }
     }
-    if(button_data_count == Button_Password_Lenght-1){
-      if(!strcmp(Button_Data, Button_Master)){
-        senzor=true;
-        openSenzor=false; 
-        sevoOpen(SENZOR);
+    stavPred = stavCLK;
+    stavSW = digitalRead(pinSW);
+    if (stavSW == 0) {
+      if(presed>20){
+        pass=pass + (String)(int)poziceEnkod;
+        poziceEnkod=0;
+        lenPass++;
+        presed=0;
         }
-        buttonClearData();   
+      presed++;
+      }
+      
+    customKey = customKeypad.getKey();
+    if(customKey=='*'){
+      lenPass=0;
+      pass=""; 
+      } 
+      
+    if(lenPass>4){
+      if (pass=="5703"){
+          pass="";
+          senzor=true;
+          openSenzor=false; 
+          sevoOpen(SENZOR);
+          }else{
+            tone(buzzer, 1500); 
+            delay(500);       
+            noTone(buzzer); 
+            lenPass=0;
+            pass="";
+          }        
       }
     }
 }
 void task3() {
   if (senzor){
-    int c = -999;
-    c = compass.read();
-    if (c > 90 and c < 120) {
+    detachInterrupt(pinPreruseni);
+    if (pocetPulzu > 10) {
       showPass=true;
       }else{
         showPass=false;
         }
+    pocetPulzu = 0;
+    attachInterrupt(pinPreruseni, prictiPulz, FALLING);
     }
 }
 void task4() {
@@ -214,21 +251,9 @@ void clearData(){
   return;
 }
 
-void buttonClearData(){
-  while(button_data_count !=0){    
-    Button_Data[button_data_count--] = 0;
-  }
-  return;
+void prictiPulz() {
+  pocetPulzu++;
 }
-
-char readButtons(){
-  if (digitalRead(buttonUP) == HIGH) {return '1';
-  } else if (digitalRead(buttonDOWN) == HIGH) { return '2';
-  } else if (digitalRead(buttonRIGHT) == HIGH) { return '4';
-  } else if (digitalRead(buttonLEFT) == HIGH) {return '3';
-  }else{return '9';}
-}
-
 
 void sevoOpen(int data){
     switch (data) {

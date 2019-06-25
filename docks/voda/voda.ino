@@ -1,7 +1,7 @@
 /**************************************
- rtOS APPLICATION MutiFunction Shield
+ rtOS
 ***************************************
-Name:     DOCK
+Name:     DOCK-voda
 Version:  v1.0     
 Libraries.........................
   rtOS.h
@@ -10,7 +10,6 @@ Libraries.........................
 #include <Wire.h>
 #include <Keypad.h>
 #include <Servo.h>  
-#include <HMC5983.h>
 /*------------------------------------*/
 rtOS TT(1);    //construct rtOS tic(1ms)
 /**************************************
@@ -33,7 +32,8 @@ const byte tT[8]= {50,1,50,100,0,0,0,0}; //period <1;256>xtic ms
 Servo keyServo;
 Servo senzorServo;
 
-HMC5983 compass;
+#define pinAnalog A0
+#define pinNapajeni 13
 
 #define Password_Lenght 5
 char Data[Password_Lenght]; 
@@ -42,24 +42,10 @@ byte data_count = 0, master_count = 0;
 bool Pass_is_good;
 char customKey;
 
-/*
- * UP - 1
- * DOWN - 2
- * LEFT - 3
- * RIGHT - 4
- */
-#define buttonUP 12
-#define buttonDOWN 13
-#define buttonLEFT A1
-#define buttonRIGHT A2
-
-#define Button_Password_Lenght 5
-char Button_Data[Button_Password_Lenght]; 
-char Button_Master[Button_Password_Lenght] = "1432"; 
-byte button_data_count = 0, button_master_count = 0;
-bool Button_Pass_is_good;
-char buttonCustomKey;
-
+#define potPin0 A1
+#define potPin1 A2
+#define potPin2 A3
+#define potPin3 A6
 
 const byte ROWS = 4; 
 const byte COLS = 3; 
@@ -80,7 +66,7 @@ byte colPins[COLS] = {4, 2, 6};
 
 Keypad customKeypad = Keypad(makeKeymap(hexaKeys), rowPins, colPins, ROWS, COLS); 
 
-char dataCode='4';
+char dataCode='1';
 /*
  * DATA
  * voda - 1
@@ -114,14 +100,15 @@ Serial.begin(9600);
 Serial.println("run");
 Wire.begin(8);               
 Wire.onRequest(requestEvent);
-pinMode(buttonUP, INPUT);
-pinMode(buttonDOWN, INPUT);
-pinMode(buttonRIGHT, INPUT);
-pinMode(buttonLEFT, INPUT);
 keyServo.attach(keyServoPin);
 senzorServo.attach(senzorServoPin);
 sevoOpen(0);
-compass.begin();
+pinMode(pinNapajeni, OUTPUT);
+pinMode(pinAnalog, INPUT);
+pinMode(potPin0, INPUT);
+pinMode(potPin1, INPUT);
+pinMode(potPin2, INPUT);
+pinMode(potPin3, INPUT);
 /*------------------------------------*/
   TT.start(); } //start rtOS
 /*   PROCEDURES SPACE
@@ -140,7 +127,7 @@ void task0() {
 
   if(data_count == Password_Lenght-1){
     if(!strcmp(Data, Master)){
-     dataCode='G';
+     dataCode='A';
      openKey=false;
      openSenzor=true;
      sevoOpen(KEY); 
@@ -151,42 +138,33 @@ void task0() {
 } 
 void task1() {
   if(showPass){
-    dataCode = 'H';
+    dataCode = 'B';
     }else{
       dataCode=dataCode;
-      if(dataCode=='H'){
-          dataCode='G';
+      if(dataCode=='B'){
+          dataCode='A';
         }
       }
 }
 void task2() {
-  // RESET input - doresit 
-  customKey = customKeypad.getKey();
-  if(customKey=='*'){
-      clearData(); 
-      buttonClearData();   
-      } 
   if (openSenzor){
-    buttonCustomKey = readButtons();
-    if (buttonCustomKey!='9'){
-      Button_Data[button_data_count] = buttonCustomKey; 
-      button_data_count++;
-    }
-    if(button_data_count == Button_Password_Lenght-1){
-      if(!strcmp(Button_Data, Button_Master)){
+    int value0 = map(analogRead(potPin0), 0, 1023, 0, 10);
+    int value1 = map(analogRead(potPin1), 0, 1023, 0, 10);
+    int value2 = map(analogRead(potPin2), 0, 1023, 0, 10);
+    int value3 = map(analogRead(potPin3), 0, 1023, 0, 10);
+    if(value0==2 and value1==7 and value2==1 and value3==9){
         senzor=true;
         openSenzor=false; 
         sevoOpen(SENZOR);
-        }
-        buttonClearData();   
-      }
+    }
     }
 }
 void task3() {
   if (senzor){
-    int c = -999;
-    c = compass.read();
-    if (c > 90 and c < 120) {
+     digitalWrite(pinNapajeni, HIGH);
+     int analog = analogRead(pinAnalog);
+     digitalWrite(pinNapajeni, LOW);
+    if (analog > 512) {
       showPass=true;
       }else{
         showPass=false;
@@ -213,22 +191,6 @@ void clearData(){
   }
   return;
 }
-
-void buttonClearData(){
-  while(button_data_count !=0){    
-    Button_Data[button_data_count--] = 0;
-  }
-  return;
-}
-
-char readButtons(){
-  if (digitalRead(buttonUP) == HIGH) {return '1';
-  } else if (digitalRead(buttonDOWN) == HIGH) { return '2';
-  } else if (digitalRead(buttonRIGHT) == HIGH) { return '4';
-  } else if (digitalRead(buttonLEFT) == HIGH) {return '3';
-  }else{return '9';}
-}
-
 
 void sevoOpen(int data){
     switch (data) {

@@ -1,7 +1,7 @@
 /**************************************
- rtOS APPLICATION MutiFunction Shield
+ rtOS
 ***************************************
-Name:     stone
+Name:     stone-vzduch
 Version:  v1.0     
 Libraries.........................
   rtOS.h

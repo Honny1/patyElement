@@ -1,7 +1,7 @@
 /**************************************
- rtOS APPLICATION MutiFunction Shield
+ rtOS
 ***************************************
-Name:     stone
+Name:     stone-voda
 Version:  v1.0     
 Libraries.........................
   rtOS.h

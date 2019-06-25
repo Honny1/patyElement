@@ -1,7 +1,7 @@
 /**************************************
- rtOS APPLICATION MutiFunction Shield
+ rtOS
 ***************************************
-Name:     DOCK
+Name:     DOCK-zeme
 Version:  v1.0     
 Libraries.........................
   rtOS.h
@@ -148,7 +148,7 @@ void task0() {
     clearData();   
   }
   }
-} 
+}
 void task1() {
   if(showPass){
     dataCode = 'H';
@@ -160,7 +160,6 @@ void task1() {
       }
 }
 void task2() {
-  // RESET input - doresit 
   customKey = customKeypad.getKey();
   if(customKey=='*'){
       clearData(); 
@@ -228,7 +227,6 @@ char readButtons(){
   } else if (digitalRead(buttonLEFT) == HIGH) {return '3';
   }else{return '9';}
 }
-
 
 void sevoOpen(int data){
     switch (data) {
