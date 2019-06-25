@@ -1,0 +1,16 @@
+VODA:
+    -keyPadPin: 3832
+    -stonePass: dfis
+    -senzorPin: pot1=2, pot2=7, pot3=1, pot4=9
+OHEN:
+    -keyPadPin: 5742
+    -stonePass: adiu
+    -senzorPin:
+VZDUCH:
+    -keyPadPin: 2348
+    -stonePass: cnsx
+    -senzorPin: 5703
+ZEME:
+    -keyPadPin: 8934
+    -stonePass: koqw
+    -senzorPin: button1, button4, button3, button2

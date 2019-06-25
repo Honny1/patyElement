@@ -37,7 +37,7 @@ HMC5983 compass;
 
 #define Password_Lenght 5
 char Data[Password_Lenght]; 
-char Master[Password_Lenght] = "1234"; 
+char Master[Password_Lenght] = "8934"; 
 byte data_count = 0, master_count = 0;
 bool Pass_is_good;
 char customKey;
