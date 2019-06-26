@@ -16,8 +16,8 @@ rtOS TT(1);    //construct rtOS tic(1ms)
      dT- delay start for task
      tT- period for schedule of task
 ***************************************/
-const byte dT[8]= {1,2,3,4,0,0,0,0}; //start delay <1;255>xtic ms
-const byte tT[8]= {50,1,50,100,0,0,0,0}; //period <1;256>xtic ms
+const byte dT[8]= {1,2,3,4,5,6,0,0}; //start delay <1;255>xtic ms
+const byte tT[8]= {50,1,10,100,100,0,0,0}; //period <1;256>xtic ms
 /**************************************
  User global definitions:
      - constants
@@ -36,16 +36,17 @@ Servo senzorServo;
 #define pinPreruseni 0
 volatile byte pocetPulzu = 0;
 
-#define pinCLK 8
-#define pinDT  9
-#define pinSW  10
-float poziceEnkod = 0;
+#define pinCLK A3
+#define pinDT  A2
+#define pinSW  A1
+int poziceEnkod = 0;
 int stavPred;
 int stavCLK;
 int stavSW;
 String pass = "";
 int lenPass=0;
-int presed=0;
+bool wait=false;
+
 
 const int buzzer = 5;
 
@@ -100,8 +101,6 @@ bool showPass = false;
 bool openSenzor = false;
 bool openKey = true;
 bool senzor = false;
-int counterTone=0;
-int counterTone1=0;
 /*-----------------------------------*/
 void setup() {
 /**************************************
@@ -143,6 +142,7 @@ void task0() {
      openKey=false;
      openSenzor=true;
      sevoOpen(KEY); 
+     poziceEnkod = 0;
     }
     clearData();   
   }
@@ -163,55 +163,45 @@ void task2() {
     stavCLK = digitalRead(pinCLK);
     if (stavCLK != stavPred) {
       if (digitalRead(pinDT) != stavCLK) {
-        poziceEnkod=poziceEnkod+0.5;
-        counterTone++;
-        if (counterTone==1){
-          tone(buzzer, 1000); 
-          delay(500);       
-          noTone(buzzer);
-          counterTone=0; 
-          }
+        poziceEnkod++;
         if(poziceEnkod>=9){poziceEnkod=0;}
       }else{
-        poziceEnkod=poziceEnkod-0.5;
-        counterTone1++;
-        if (counterTone1==1){
-          tone(buzzer, 500); 
-          delay(500);       
-          noTone(buzzer);
-          counterTone1=0; 
-          }
+        poziceEnkod--;
         if(poziceEnkod<0){poziceEnkod=9;}
       }
     }
     stavPred = stavCLK;
+
+    Serial.println(poziceEnkod);
+    Serial.println(pass);
+    
     stavSW = digitalRead(pinSW);
     if (stavSW == 0) {
-      if(presed>20){
-        pass=pass + (String)(int)poziceEnkod;
-        poziceEnkod=0;
-        lenPass++;
-        presed=0;
-        }
-      presed++;
+      wait=true;
+      }
+    if(wait and stavSW==1){
+      pass=pass + (String)(int)poziceEnkod;
+      poziceEnkod=0;
+      lenPass++;
+      wait=false;
       }
       
     customKey = customKeypad.getKey();
     if(customKey=='*'){
       lenPass=0;
-      pass=""; 
+      pass="";
+      poziceEnkod=0; 
       } 
       
-    if(lenPass>4){
+    if(lenPass>3){
+      Serial.print(pass);
       if (pass=="5703"){
+          Serial.print("ok");
           pass="";
           senzor=true;
           openSenzor=false; 
           sevoOpen(SENZOR);
           }else{
-            tone(buzzer, 1500); 
-            delay(500);       
-            noTone(buzzer); 
             lenPass=0;
             pass="";
           }        
