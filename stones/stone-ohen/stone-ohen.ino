@@ -21,8 +21,8 @@ const byte tT[8]= {16,123,0,0,0,0,0,0}; //period <1;256>xtic ms
      - constants
      - variables
 *******D E C L A R A T I O N s*********/
-int ROW_PINS[] = {2,3,4,5,6,7,8,12,13};
-int COL_PINS[] = {9,10,11};
+int ROW_PINS[] = {2,4,5,6,7,8,9,12,13};
+int COL_PINS[] = {3,10,11};
                    // ABC  DEF  GHI  JKL  MNO  PQR  STU  VWX  YZ
 byte PATTERN[3][9]={{B011,B011,B110,B111,B111,B111,B110,B111,B111},
                    {B111,B111,B111,B111,B111,B111,B111,B111,B111},
