@@ -48,7 +48,6 @@ int lenPass=0;
 bool wait=false;
 
 
-const int buzzer = 5;
 
 #define Password_Lenght 5
 char Data[Password_Lenght]; 
@@ -118,8 +117,7 @@ pinMode(pinPrutokomer, INPUT);
 attachInterrupt(pinPreruseni, prictiPulz, FALLING);
 pinMode(pinCLK, INPUT);
 pinMode(pinDT, INPUT);
-pinMode(pinSW, INPUT_PULLUP);
-pinMode(buzzer, OUTPUT); 
+pinMode(pinSW, INPUT_PULLUP); 
 /*------------------------------------*/
   TT.start(); } //start rtOS
 /*   PROCEDURES SPACE
@@ -178,12 +176,11 @@ void task2() {
     stavSW = digitalRead(pinSW);
     if (stavSW == 0) {
       wait=true;
-      }
-    if(wait and stavSW==1){
-      pass=pass + (String)(int)poziceEnkod;
-      poziceEnkod=0;
-      lenPass++;
-      wait=false;
+      }else if(wait and stavSW==1){
+        pass=pass + (String)(int)poziceEnkod;
+        poziceEnkod=0;
+        lenPass++;
+        wait=false;
       }
       
     customKey = customKeypad.getKey();
