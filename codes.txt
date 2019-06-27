@@ -1,3 +1,7 @@
+-keyPadPin = heslo pro otevreni klice + rozne kamen
+-senzorPin = heslo pro otevreni senzoru
+-stonePass = heslo co ukazuje kamen 
+
 VODA:
     -keyPadPin: 3832
     -stonePass: dfis
@@ -5,7 +9,7 @@ VODA:
 OHEN:
     -keyPadPin: 5742
     -stonePass: adiu
-    -senzorPin:
+    -senzorPin: on,off,on,on, off... 
 VZDUCH:
     -keyPadPin: 2348
     -stonePass: cnsx
@@ -13,4 +17,4 @@ VZDUCH:
 ZEME:
     -keyPadPin: 8934
     -stonePass: koqw
-    -senzorPin: button1, button4, button3, button2
+    -senzorPin: button1, button4, button3, button2.. 
