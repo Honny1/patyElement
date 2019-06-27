@@ -28,13 +28,13 @@ const byte tT[8]= {50,1,50,100,0,0,0,0}; //period <1;256>xtic ms
 #define KEY 1
 #define SENZOR 2
 
-#define keyServoPin 9
+#define keyServoPin 11
 #define senzorServoPin 10
 
 Servo keyServo;
 Servo senzorServo;
 
-const int pinCidlaDS = 4;
+const int pinCidlaDS = 12;
 OneWire oneWireDS(pinCidlaDS);
 DallasTemperature senzoryDS(&oneWireDS);
 
@@ -58,15 +58,16 @@ char hexaKeys[ROWS][COLS] = {
 };
 
 
-   //pins on keypad - 2,7,6,4
-byte rowPins[ROWS] = {3,8,7,5}; 
+//pins on keypad - 2,7,6,4
+byte rowPins[ROWS] = {4,9,8,6}; 
    //pins on keypad - 3, 1, 5
-byte colPins[COLS] = {13, 2, 6};
+byte colPins[COLS] = {5, 3, 7};
+
 
 
 Keypad customKeypad = Keypad(makeKeymap(hexaKeys), rowPins, colPins, ROWS, COLS); 
 
-char dataCode='2';
+char dataCode='C';
 /*
  * DATA
  * voda - 1
