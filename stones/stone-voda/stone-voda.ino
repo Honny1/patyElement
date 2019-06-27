@@ -176,24 +176,24 @@ void animation(int pD){
 }
 
 void comunicationI2C() {
-  //Serial.print("connect: ");
+  Serial.print("connect: ");
   data = Wire.read();
   if(data==stoneNum){
       connectionOK= true;
-      //Serial.println("Good dock");
+      Serial.println("Good dock");
     }else if(data == lightOnCode){
-      //Serial.println("lightON");
+      Serial.println("lightON");
       connectionOK= true;
       showPass = false;
       lightOn = true;
    }else if(data == showPassCode){
-      //Serial.println("show pass");
+      Serial.println("show pass");
       connectionOK= true;
       showPass = true;
       lightOn = false;
    }else{
       connectionOK = false;
-      //Serial.println("bad dock");
+      Serial.println("bad dock");
     }
    data=0;
 }

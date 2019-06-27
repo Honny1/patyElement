@@ -40,6 +40,7 @@ bool wait=false;
 String PASSWORD="AHOJ";
 String aPASSWORD="AHOJA";
 bool showINPUT=true;
+int pressed=0;
 
 #define pinCLK1 4
 #define pinDT1  5
@@ -122,20 +123,20 @@ lcd.print("|");
   
 pinMode(pinCLK, INPUT);
 pinMode(pinDT, INPUT);
-pinMode(pinSW, INPUT_PULLUP);
+pinMode(pinSW, INPUT);
 poziceEnkod = random(65, 90);
 
 
 pinMode(pinCLK1, INPUT);
 pinMode(pinDT1, INPUT);
-pinMode(pinSW1, INPUT_PULLUP);
+pinMode(pinSW1, INPUT);
 poziceEnkod1 = random(65, 90);
 
 
 
 pinMode(pinCLK2, INPUT);
 pinMode(pinDT2, INPUT);
-pinMode(pinSW2, INPUT_PULLUP);
+pinMode(pinSW2, INPUT);
 poziceEnkod2 = random(65, 90);
 
 
@@ -164,14 +165,28 @@ void task0() {
     stavPred = stavCLK;
 
     stavSW = digitalRead(pinSW);
+    Serial.print(stavSW);
+    Serial.print("-");
     if (stavSW == 0) {
       wait=true;
+      pressed++;
+      }
+    if(wait and pressed>100){
+        pass="";
+        poziceEnkod=65;
+        lenPass=0;
+        wait=false;
+        lcd.setCursor ( 0, 0 );
+        lcd.print("    |");
+        pressed=0;
       }else if(wait and stavSW==1){
         pass=pass + (String)(char)poziceEnkod;
         poziceEnkod=65;
         lenPass++;
         wait=false;
-      }
+        pressed=0;
+        }
+     Serial.println(pressed);
 
     if(showINPUT){  
     lcd.setCursor(0,0);

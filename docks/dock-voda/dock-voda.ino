@@ -26,26 +26,22 @@ const byte tT[8]= {50,1,50,100,0,0,0,0}; //period <1;256>xtic ms
 #define KEY 1
 #define SENZOR 2
 
-#define keyServoPin 9
+#define keyServoPin 11
 #define senzorServoPin 10
 
 Servo keyServo;
 Servo senzorServo;
 
 #define pinAnalog A0
-#define pinNapajeni 13
+#define pinNapajeni A1
 
 #define Password_Lenght 5
 char Data[Password_Lenght]; 
-char Master[Password_Lenght] = "3832"; 
+char Master[Password_Lenght] = "3832";
+char Master1[Password_Lenght] = "8756"; 
 byte data_count = 0, master_count = 0;
 bool Pass_is_good;
 char customKey;
-
-#define potPin0 A1
-#define potPin1 A2
-#define potPin2 A3
-#define potPin3 A6
 
 const byte ROWS = 4; 
 const byte COLS = 3; 
@@ -59,9 +55,9 @@ char hexaKeys[ROWS][COLS] = {
 
 
    //pins on keypad - 2,7,6,4
-byte rowPins[ROWS] = {3,8,7,5}; 
+byte rowPins[ROWS] = {4,9,8,6}; 
    //pins on keypad - 3, 1, 5
-byte colPins[COLS] = {4, 2, 6};
+byte colPins[COLS] = {5, 3, 7};
 
 
 Keypad customKeypad = Keypad(makeKeymap(hexaKeys), rowPins, colPins, ROWS, COLS); 
@@ -88,7 +84,6 @@ char dataCode='1';
  
 bool showPass = false;
 bool openSenzor = false;
-bool openKey = true;
 bool senzor = false;
 /*-----------------------------------*/
 void setup() {
@@ -105,17 +100,12 @@ senzorServo.attach(senzorServoPin);
 sevoOpen(0);
 pinMode(pinNapajeni, OUTPUT);
 pinMode(pinAnalog, INPUT);
-pinMode(potPin0, INPUT);
-pinMode(potPin1, INPUT);
-pinMode(potPin2, INPUT);
-pinMode(potPin3, INPUT);
 /*------------------------------------*/
   TT.start(); } //start rtOS
 /*   PROCEDURES SPACE
      task0 ... task7
 ********U S E R   C O D E**************/
 void task0() {
-  if(openKey){
   customKey = customKeypad.getKey();
   if (customKey){
     Data[data_count] = customKey; 
@@ -124,17 +114,24 @@ void task0() {
       clearData();   
       } 
   }
-
   if(data_count == Password_Lenght-1){
-    if(!strcmp(Data, Master)){
-     dataCode='A';
-     openKey=false;
-     openSenzor=true;
-     sevoOpen(KEY); 
-    }
-    clearData();   
+    if (openSenzor){
+      if(!strcmp(Data, Master1)){
+           senzor=true;
+           openSenzor=false; 
+           sevoOpen(SENZOR);
+        }
+        clearData(); 
+    }else{
+      if(!strcmp(Data, Master)){
+          dataCode='A';
+          openSenzor=true;
+          sevoOpen(KEY); 
+        }
+        clearData();   
+        }
   }
-  }
+ 
 } 
 void task1() {
   if(showPass){
@@ -147,17 +144,6 @@ void task1() {
       }
 }
 void task2() {
-  if (openSenzor){
-    int value0 = map(analogRead(potPin0), 0, 1023, 0, 10);
-    int value1 = map(analogRead(potPin1), 0, 1023, 0, 10);
-    int value2 = map(analogRead(potPin2), 0, 1023, 0, 10);
-    int value3 = map(analogRead(potPin3), 0, 1023, 0, 10);
-    if(value0==2 and value1==7 and value2==1 and value3==9){
-        senzor=true;
-        openSenzor=false; 
-        sevoOpen(SENZOR);
-    }
-    }
 }
 void task3() {
   if (senzor){
@@ -195,14 +181,14 @@ void clearData(){
 void sevoOpen(int data){
     switch (data) {
     case 0:   
-      keyServo.write(0);
-      senzorServo.write(0);
+      keyServo.write(180);
+      senzorServo.write(180);
       break;
     case 1:    
-      keyServo.write(180);
+      keyServo.write(0);
       break;
     case 2:
-      senzorServo.write(180);
+      senzorServo.write(0);
       break;
   }
 }

@@ -1,7 +1,7 @@
 VODA:
     -keyPadPin: 3832
     -stonePass: dfis
-    -senzorPin: pot1=2, pot2=7, pot3=1, pot4=9
+    -senzorPin: 8756
 OHEN:
     -keyPadPin: 5742
     -stonePass: adiu
