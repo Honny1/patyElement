@@ -156,7 +156,7 @@ void task2() {
 void task3() {
   if (senzor) {
     senzoryDS.requestTemperatures();
-    if ((int)senzoryDS.getTempCByIndex(0) > 50) {
+    if ((int)senzoryDS.getTempCByIndex(0) > 65) {
       showPass = true;
     } else {
       showPass = false;
