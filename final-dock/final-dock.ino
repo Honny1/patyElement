@@ -16,8 +16,8 @@ rtOS TT(1);    //construct rtOS tic(1ms)
      dT- delay start for task
      tT- period for schedule of task
 ***************************************/
-const byte dT[8] = {1, 2, 3, 4, 5, 0, 0, 0}; //start delay <1;255>xtic ms
-const byte tT[8] = {10, 10, 10, 10, 1, 0, 0, 0}; //period <1;256>xtic ms
+const byte dT[8] = {1, 2, 3, 4, 5, 6, 0, 0}; //start delay <1;255>xtic ms
+const byte tT[8] = {10, 10, 10, 10, 30, 0, 0, 0}; //period <1;256>xtic ms
 /**************************************
   User global definitions:
      - constants
@@ -107,6 +107,10 @@ bool open1SERVO3 = false;
 Servo keyServo;
 Servo senzorServo;
 
+#define LED 9
+int brightness = 0;
+int fadeAmount = 5; 
+bool lightOn = false;
 /*-----------------------------------*/
 void setup() {
   /**************************************
@@ -147,6 +151,8 @@ void setup() {
   pinMode(pinDT3, INPUT);
   pinMode(pinSW3, INPUT_PULLUP);
   poziceEnkod3 = random(65, 90);
+
+  pinMode(LED, OUTPUT);
 
   sevoOpen(0);
   /*------------------------------------*/
@@ -477,11 +483,21 @@ void task3() {
 void task4() {
   if (openSERVO and openSERVO1 and openSERVO2 and openSERVO3) {
     sevoOpen(KEY);
+    lightOn=true;
   } else if (open1SERVO and open1SERVO1 and open1SERVO2 and open1SERVO3) {
     sevoOpen(SENZOR);
   }
 }
 void task5() {
+  if (lightOn){
+    analogWrite(LED, brightness);
+    brightness = brightness + fadeAmount;
+    if (brightness <= 0 || brightness >= 255) {
+      fadeAmount = -fadeAmount;
+      }
+    }else{
+      analogWrite(LED, 0);
+    }
 }
 void task6() {
 }
