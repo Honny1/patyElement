@@ -34,11 +34,12 @@ const byte tT[8] = {50, 1, 50, 100, 0, 0, 0, 0}; //period <1;256>xtic ms
 Servo keyServo;
 Servo senzorServo;
 
-const int pinCidlaDS = 12;
+const int pinCidlaDS = 2;
 OneWire oneWireDS(pinCidlaDS);
 DallasTemperature senzoryDS(&oneWireDS);
 
 #define pinSwitches A3
+#define pinSwitches1 A0
 
 #define Password_Lenght 5
 char Data[Password_Lenght];
@@ -67,7 +68,7 @@ byte colPins[COLS] = {5, 3, 7};
 
 Keypad customKeypad = Keypad(makeKeymap(hexaKeys), rowPins, colPins, ROWS, COLS);
 
-char dataCode = 'C';
+char dataCode = '2';
 /*
    DATA
    voda - 1
@@ -106,6 +107,7 @@ void setup() {
   sevoOpen(0);
   senzoryDS.begin();
   pinMode(pinSwitches, INPUT);
+  pinMode(pinSwitches1, INPUT);
   /*------------------------------------*/
   TT.start();
 } //start rtOS
@@ -146,7 +148,9 @@ void task1() {
 }
 void task2() {
   if (openSenzor) {
-    if (analogRead(pinSwitches) > 500 and analogRead(pinSwitches) < 800 ) {
+    Serial.println(analogRead(pinSwitches));
+    Serial.println(analogRead(pinSwitches1));
+    if ((analogRead(pinSwitches) > 500 and analogRead(pinSwitches) < 800) and (analogRead(pinSwitches1) > 500 and analogRead(pinSwitches1) < 800) ) {
       senzor = true;
       openSenzor = false;
       sevoOpen(SENZOR);
@@ -156,7 +160,8 @@ void task2() {
 void task3() {
   if (senzor) {
     senzoryDS.requestTemperatures();
-    if ((int)senzoryDS.getTempCByIndex(0) > 65) {
+    Serial.println((int)senzoryDS.getTempCByIndex(0));
+    if ((int)senzoryDS.getTempCByIndex(0) > 50) {
       showPass = true;
     } else {
       showPass = false;
@@ -187,14 +192,14 @@ void clearData() {
 void sevoOpen(int data) {
   switch (data) {
     case 0:
-      keyServo.write(0);
-      senzorServo.write(0);
+      keyServo.write(180);
+      senzorServo.write(180);
       break;
     case 1:
-      keyServo.write(180);
+      keyServo.write(0);
       break;
     case 2:
-      senzorServo.write(180);
+      senzorServo.write(0);
       break;
   }
 }

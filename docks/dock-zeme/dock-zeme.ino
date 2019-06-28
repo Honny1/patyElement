@@ -27,7 +27,7 @@ const byte tT[8] = {50, 1, 50, 100, 0, 0, 0, 0}; //period <1;256>xtic ms
 #define KEY 1
 #define SENZOR 2
 
-#define keyServoPin 9
+#define keyServoPin 11
 #define senzorServoPin 10
 
 Servo keyServo;
@@ -48,14 +48,14 @@ char customKey;
    LEFT - 3
    RIGHT - 4
 */
-#define buttonUP 12
-#define buttonDOWN 13
-#define buttonLEFT A1
-#define buttonRIGHT A2
+#define buttonUP A3
+#define buttonDOWN A2
+#define buttonLEFT A0
+#define buttonRIGHT A1
 
 #define Button_Password_Lenght 5
 char Button_Data[Button_Password_Lenght];
-char Button_Master[Button_Password_Lenght] = "1432";
+char Button_Master[Button_Password_Lenght] = "SJVZ";
 byte button_data_count = 0, button_master_count = 0;
 bool Button_Pass_is_good;
 char buttonCustomKey;
@@ -73,9 +73,9 @@ char hexaKeys[ROWS][COLS] = {
 
 
 //pins on keypad - 2,7,6,4
-byte rowPins[ROWS] = {3, 8, 7, 5};
+byte rowPins[ROWS] = {4, 9, 8, 6};
 //pins on keypad - 3, 1, 5
-byte colPins[COLS] = {4, 2, 6};
+byte colPins[COLS] = {5, 3, 7};
 
 
 Keypad customKeypad = Keypad(makeKeymap(hexaKeys), rowPins, colPins, ROWS, COLS);
@@ -138,7 +138,7 @@ void task0() {
         clearData();
       }
     }
-
+    Serial.println(Data);
     if (data_count == Password_Lenght - 1) {
       if (!strcmp(Data, Master)) {
         dataCode = 'G';
@@ -172,6 +172,7 @@ void task2() {
       Button_Data[button_data_count] = buttonCustomKey;
       button_data_count++;
     }
+    Serial.println(Button_Data);
     if (button_data_count == Button_Password_Lenght - 1) {
       if (!strcmp(Button_Data, Button_Master)) {
         senzor = true;
@@ -186,6 +187,7 @@ void task3() {
   if (senzor) {
     int c = -999;
     c = compass.read();
+    Serial.println(c);
     if (c > 90 and c < 120) {
       showPass = true;
     } else {
@@ -222,14 +224,18 @@ void buttonClearData() {
 }
 
 char readButtons() {
-  if (digitalRead(buttonUP) == HIGH) {
-    return '1';
-  } else if (digitalRead(buttonDOWN) == HIGH) {
-    return '2';
-  } else if (digitalRead(buttonRIGHT) == HIGH) {
-    return '4';
-  } else if (digitalRead(buttonLEFT) == HIGH) {
-    return '3';
+  if (analogRead(buttonUP) == 0) {
+    delay(500);
+    return 'S';
+  } else if (analogRead(buttonDOWN) == 0) {
+    delay(500);
+    return 'J';
+  } else if (analogRead(buttonRIGHT) == 0) {
+    delay(500);
+    return 'V';
+  } else if (analogRead(buttonLEFT) == 0) {
+    delay(500);
+    return 'Z';
   } else {
     return '9';
   }
@@ -238,14 +244,14 @@ char readButtons() {
 void sevoOpen(int data) {
   switch (data) {
     case 0:
-      keyServo.write(0);
-      senzorServo.write(0);
+      keyServo.write(10);
+      senzorServo.write(170);
       break;
     case 1:
       keyServo.write(180);
       break;
     case 2:
-      senzorServo.write(180);
+      senzorServo.write(0);
       break;
   }
 }
