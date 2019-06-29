@@ -27,9 +27,9 @@ LiquidCrystal_I2C lcd(0x27, 20, 4);
 
 
 
-#define pinCLK 2
-#define pinDT  3
-#define pinSW  A3
+#define pinCLK 5
+#define pinDT  4
+#define pinSW  3
 int poziceEnkod = 65;
 int stavPred;
 int stavCLK;
@@ -42,9 +42,9 @@ String aPASSWORD = "AHOJA";
 bool showINPUT = true;
 int pressed = 0;
 
-#define pinCLK1 4
-#define pinDT1  5
-#define pinSW1  A2
+#define pinCLK1 13
+#define pinDT1  12
+#define pinSW1  A0
 int poziceEnkod1 = 65;
 int stavPred1;
 int stavCLK1;
@@ -57,8 +57,8 @@ String aPASSWORD1 = "AHOJA";
 bool showINPUT1 = true;
 int pressed1 = 0;
 
-#define pinCLK2 6
-#define pinDT2  7
+#define pinCLK2 A3
+#define pinDT2  A2
 #define pinSW2  A1
 int poziceEnkod2 = 65;
 int stavPred2;
@@ -72,9 +72,9 @@ String aPASSWORD2 = "AHOJA";
 bool showINPUT2 = true;
 int pressed2 = 0;
 
-#define pinCLK3 8
-#define pinDT3  9
-#define pinSW3  A0
+#define pinCLK3 7
+#define pinDT3  8
+#define pinSW3  6
 int poziceEnkod3 = 65;
 int stavPred3;
 int stavCLK3;
@@ -149,7 +149,7 @@ void setup() {
 
   pinMode(pinCLK3, INPUT);
   pinMode(pinDT3, INPUT);
-  pinMode(pinSW3, INPUT_PULLUP);
+  pinMode(pinSW3, INPUT);
   poziceEnkod3 = random(65, 90);
 
   pinMode(LED, OUTPUT);
@@ -163,6 +163,8 @@ void setup() {
 ********U S E R   C O D E**************/
 void task0() {
   stavCLK = digitalRead(pinCLK);
+  Serial.println("isidufdghiu");
+  Serial.println(stavCLK);
   if (stavCLK != stavPred) {
     if (digitalRead(pinDT) != stavCLK) {
       poziceEnkod++;
@@ -177,8 +179,9 @@ void task0() {
     }
   }
   stavPred = stavCLK;
-
+  Serial.println(poziceEnkod);
   stavSW = digitalRead(pinSW);
+  Serial.println(stavS);
   if (stavSW == 0) {
     wait = true;
     pressed++;
@@ -198,6 +201,7 @@ void task0() {
     wait = false;
     pressed = 0;
   }
+
   
   if (showINPUT) {
     lcd.setCursor(0, 0);
@@ -279,7 +283,11 @@ void task1() {
     wait1 = false;
     pressed1 = 0;
   }
-  
+  if (showINPUT1) {
+    lcd.setCursor(0, 1);
+    lcd.print(pass1);
+    lcd.print((char)poziceEnkod1);
+  }
   if (openSERVO1) {
     if (lenPass1 > 4) {
       Serial.println(pass1);

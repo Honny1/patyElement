@@ -26,7 +26,7 @@ const byte tT[8] = {50, 1, 10, 100, 100, 0, 0, 0}; //period <1;256>xtic ms
 #define KEY 1
 #define SENZOR 2
 
-#define keyServoPin 9
+#define keyServoPin 11
 #define senzorServoPin 10
 
 Servo keyServo;
@@ -36,9 +36,9 @@ Servo senzorServo;
 #define pinPreruseni 0
 volatile byte pocetPulzu = 0;
 
-#define pinCLK A3
-#define pinDT  A2
-#define pinSW  A1
+#define pinCLK 12
+#define pinDT  13
+#define pinSW  A0
 int poziceEnkod = 0;
 int stavPred;
 int stavCLK;
@@ -67,11 +67,11 @@ char hexaKeys[ROWS][COLS] = {
   {'*', '0', '#'}
 };
 
-
 //pins on keypad - 2,7,6,4
-byte rowPins[ROWS] = {3, 8, 7, 11};
+byte rowPins[ROWS] = {4, 9, 8, 6};
 //pins on keypad - 3, 1, 5
-byte colPins[COLS] = {4, 12, 6};
+byte colPins[COLS] = {5, 3, 7};
+
 
 
 Keypad customKeypad = Keypad(makeKeymap(hexaKeys), rowPins, colPins, ROWS, COLS);
@@ -117,7 +117,7 @@ void setup() {
   attachInterrupt(pinPreruseni, prictiPulz, FALLING);
   pinMode(pinCLK, INPUT);
   pinMode(pinDT, INPUT);
-  pinMode(pinSW, INPUT_PULLUP);
+  pinMode(pinSW, INPUT);
   /*------------------------------------*/
   TT.start();
 } //start rtOS
@@ -134,7 +134,8 @@ void task0() {
         clearData();
       }
     }
-
+    Serial.println(Data);
+  
     if (data_count == Password_Lenght - 1) {
       if (!strcmp(Data, Master)) {
         dataCode = 'E';
@@ -174,14 +175,16 @@ void task2() {
       }
     }
     stavPred = stavCLK;
-
+    Serial.println("aaa");
     Serial.println(poziceEnkod);
     Serial.println(pass);
 
-    stavSW = digitalRead(pinSW);
+    stavSW = analogRead(pinSW);
+    Serial.println(stavSW);
+    delay(500);
     if (stavSW == 0) {
       wait = true;
-    } else if (wait and stavSW == 1) {
+    } else if (wait and stavSW > 0) {
       pass = pass + (String)(int)poziceEnkod;
       poziceEnkod = 0;
       lenPass++;
@@ -212,6 +215,7 @@ void task2() {
 }
 void task3() {
   if (senzor) {
+    Serial.println(pocetPulzu);
     detachInterrupt(pinPreruseni);
     if (pocetPulzu > 10) {
       showPass = true;
@@ -250,8 +254,8 @@ void prictiPulz() {
 void sevoOpen(int data) {
   switch (data) {
     case 0:
-      keyServo.write(0);
-      senzorServo.write(0);
+      keyServo.write(10);
+      senzorServo.write(30);
       break;
     case 1:
       keyServo.write(180);
