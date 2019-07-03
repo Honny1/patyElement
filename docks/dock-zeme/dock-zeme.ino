@@ -188,7 +188,7 @@ void task3() {
     int c = -999;
     c = compass.read();
     Serial.println(c);
-    if (c > 90 and c < 120) {
+    if (c > 317 and c < 357) {
       showPass = true;
     } else {
       showPass = false;
@@ -229,10 +229,10 @@ char readButtons() {
     return 'S';
   } else if (analogRead(buttonDOWN) == 0) {
     delay(500);
-    return 'J';
+    return 'V';
   } else if (analogRead(buttonRIGHT) == 0) {
     delay(500);
-    return 'V';
+    return 'J';
   } else if (analogRead(buttonLEFT) == 0) {
     delay(500);
     return 'Z';

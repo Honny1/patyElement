@@ -46,6 +46,7 @@ int stavSW;
 String pass = "";
 int lenPass = 0;
 bool wait = false;
+int pres = 0;
 
 
 
@@ -181,14 +182,19 @@ void task2() {
 
     stavSW = analogRead(pinSW);
     Serial.println(stavSW);
-    delay(500);
+    //delay(500);
+    Serial.println(pres);
     if (stavSW == 0) {
-      wait = true;
-    } else if (wait and stavSW > 0) {
+      delay(1000);
+      if(digitalRead(pinSW)==0){
+        wait = true;
+        }}
+    if (wait and stavSW > 0) {
       pass = pass + (String)(int)poziceEnkod;
       poziceEnkod = 0;
       lenPass++;
       wait = false;
+      pres = 0;
     }
 
     customKey = customKeypad.getKey();

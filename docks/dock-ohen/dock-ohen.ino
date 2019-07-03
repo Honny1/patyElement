@@ -150,7 +150,7 @@ void task2() {
   if (openSenzor) {
     Serial.println(analogRead(pinSwitches));
     Serial.println(analogRead(pinSwitches1));
-    if ((analogRead(pinSwitches) > 500 and analogRead(pinSwitches) < 800) and (analogRead(pinSwitches1) > 500 and analogRead(pinSwitches1) < 800) ) {
+    if ((analogRead(pinSwitches) > 1014) and (analogRead(pinSwitches1) > 970 and analogRead(pinSwitches1) < 990) ) {
       senzor = true;
       openSenzor = false;
       sevoOpen(SENZOR);
