@@ -53,9 +53,9 @@ char customKey;
 #define buttonLEFT A0
 #define buttonRIGHT A1
 
-#define Button_Password_Lenght 5
+#define Button_Password_Lenght 6
 char Button_Data[Button_Password_Lenght];
-char Button_Master[Button_Password_Lenght] = "SJVZ";
+char Button_Master[Button_Password_Lenght] = "ZSJVZ";
 byte button_data_count = 0, button_master_count = 0;
 bool Button_Pass_is_good;
 char buttonCustomKey;

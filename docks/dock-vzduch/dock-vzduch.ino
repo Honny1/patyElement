@@ -206,7 +206,7 @@ void task2() {
 
     if (lenPass > 3) {
       Serial.print(pass);
-      if (pass == "5703") {
+      if (pass == "5723") {
         Serial.print("ok");
         pass = "";
         senzor = true;
