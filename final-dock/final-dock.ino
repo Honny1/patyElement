@@ -25,6 +25,12 @@ const byte tT[8] = {10, 10, 10, 10, 30, 0, 0, 0}; //period <1;256>xtic ms
 *******D E C L A R A T I O N s*********/
 LiquidCrystal_I2C lcd(0x27, 20, 4);
 
+/*
+ * voda - DQST - I
+ * ohen - CFJV - C
+ * vzduch - AENP - H
+ * zeme - HLMS - F
+ */
 
 
 #define pinCLK 5
@@ -37,8 +43,8 @@ int stavSW;
 String pass = "";
 int lenPass = 0;
 bool wait = false;
-String PASSWORD = "AHOJ";
-String aPASSWORD = "AHOJA";
+String PASSWORD = "AAAA";
+String aPASSWORD = "AAAAA";
 bool showINPUT = true;
 int pressed = 0;
 
@@ -52,8 +58,8 @@ int stavSW1;
 String pass1 = "";
 int lenPass1 = 0;
 bool wait1 = false;
-String PASSWORD1 = "AHOJ";
-String aPASSWORD1 = "AHOJA";
+String PASSWORD1 = "AAAA";
+String aPASSWORD1 = "AAAAA";
 bool showINPUT1 = true;
 int pressed1 = 0;
 
@@ -67,8 +73,8 @@ int stavSW2;
 String pass2 = "";
 int lenPass2 = 0;
 bool wait2 = false;
-String PASSWORD2 = "AHOJ";
-String aPASSWORD2 = "AHOJA";
+String PASSWORD2 = "AAAA";
+String aPASSWORD2 = "AAAAA";
 bool showINPUT2 = true;
 int pressed2 = 0;
 
@@ -82,8 +88,8 @@ int stavSW3;
 String pass3 = "";
 int lenPass3 = 0;
 bool wait3 = false;
-String PASSWORD3 = "AHOJ";
-String aPASSWORD3 = "AHOJA";
+String PASSWORD3 = "AAAA";
+String aPASSWORD3 = "AAAAA";
 bool showINPUT3 = true;
 int pressed3 = 0;
 
@@ -130,30 +136,31 @@ void setup() {
 
   pinMode(pinCLK, INPUT);
   pinMode(pinDT, INPUT);
-  pinMode(pinSW, INPUT);
+  pinMode(pinSW, INPUT_PULLUP);
   poziceEnkod = random(65, 90);
 
 
   pinMode(pinCLK1, INPUT);
   pinMode(pinDT1, INPUT);
-  pinMode(pinSW1, INPUT);
+  pinMode(pinSW1, INPUT_PULLUP);
   poziceEnkod1 = random(65, 90);
 
 
 
   pinMode(pinCLK2, INPUT);
   pinMode(pinDT2, INPUT);
-  pinMode(pinSW2, INPUT);
+  pinMode(pinSW2, INPUT_PULLUP);
   poziceEnkod2 = random(65, 90);
 
 
   pinMode(pinCLK3, INPUT);
   pinMode(pinDT3, INPUT);
-  pinMode(pinSW3, INPUT);
+  pinMode(pinSW3, INPUT_PULLUP);
   poziceEnkod3 = random(65, 90);
 
   pinMode(LED, OUTPUT);
-
+  keyServo.attach(keyServoPin);
+  senzorServo.attach(senzorServoPin);
   sevoOpen(0);
   /*------------------------------------*/
   TT.start();
@@ -163,8 +170,6 @@ void setup() {
 ********U S E R   C O D E**************/
 void task0() {
   stavCLK = digitalRead(pinCLK);
-  Serial.println("isidufdghiu");
-  Serial.println(stavCLK);
   if (stavCLK != stavPred) {
     if (digitalRead(pinDT) != stavCLK) {
       poziceEnkod++;
@@ -179,9 +184,7 @@ void task0() {
     }
   }
   stavPred = stavCLK;
-  Serial.println(poziceEnkod);
   stavSW = digitalRead(pinSW);
-  Serial.println(stavS);
   if (stavSW == 0) {
     wait = true;
     pressed++;
@@ -454,7 +457,7 @@ void task3() {
     if (lenPass3 > 4) {
       Serial.println(pass3);
       if (pass3 == aPASSWORD3) {
-        lcd.setCursor ( 0, 0 );
+        lcd.setCursor ( 0, 3 );
         lcd.print("                    ");
         pass3 = "";
         lenPass3 = 0;
@@ -492,7 +495,8 @@ void task4() {
   if (openSERVO and openSERVO1 and openSERVO2 and openSERVO3) {
     sevoOpen(KEY);
     lightOn=true;
-  } else if (open1SERVO and open1SERVO1 and open1SERVO2 and open1SERVO3) {
+  }  
+  if (open1SERVO and open1SERVO1 and open1SERVO2 and open1SERVO3) {
     sevoOpen(SENZOR);
   }
 }
@@ -516,14 +520,14 @@ void task7() {
 void sevoOpen(int data) {
   switch (data) {
     case 0:
-      keyServo.write(0);
-      senzorServo.write(0);
+      keyServo.write(130);
+      senzorServo.write(170);
       break;
     case 1:
-      keyServo.write(180);
+      keyServo.write(1);
       break;
     case 2:
-      senzorServo.write(180);
+      senzorServo.write(1);
       break;
   }
 }

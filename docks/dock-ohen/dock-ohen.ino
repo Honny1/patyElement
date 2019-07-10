@@ -154,7 +154,9 @@ void task2() {
       senzor = true;
       openSenzor = false;
       sevoOpen(SENZOR);
-    }
+    }else{
+      senzorServo.write(180);
+      }
   }
 }
 void task3() {
