@@ -27,8 +27,8 @@ LiquidCrystal_I2C lcd(0x27, 20, 4);
 
 /*
  * voda - DQST - I
- * ohen - CFJV - C
- * vzduch - AENP - H
+ * ohen - DGIX - C
+ * vzduch - AELW - H
  * zeme - HLMS - F
  */
 
@@ -43,8 +43,8 @@ int stavSW;
 String pass = "";
 int lenPass = 0;
 bool wait = false;
-String PASSWORD = "AAAA";
-String aPASSWORD = "AAAAA";
+String PASSWORD = "DQST";
+String aPASSWORD = "DQSTI";
 bool showINPUT = true;
 int pressed = 0;
 
@@ -58,8 +58,8 @@ int stavSW1;
 String pass1 = "";
 int lenPass1 = 0;
 bool wait1 = false;
-String PASSWORD1 = "AAAA";
-String aPASSWORD1 = "AAAAA";
+String PASSWORD1 = "DGIX";
+String aPASSWORD1 = "DGIXC";
 bool showINPUT1 = true;
 int pressed1 = 0;
 
@@ -73,8 +73,8 @@ int stavSW2;
 String pass2 = "";
 int lenPass2 = 0;
 bool wait2 = false;
-String PASSWORD2 = "AAAA";
-String aPASSWORD2 = "AAAAA";
+String PASSWORD2 = "AELW";
+String aPASSWORD2 = "AELWH";
 bool showINPUT2 = true;
 int pressed2 = 0;
 
@@ -88,8 +88,8 @@ int stavSW3;
 String pass3 = "";
 int lenPass3 = 0;
 bool wait3 = false;
-String PASSWORD3 = "AAAA";
-String aPASSWORD3 = "AAAAA";
+String PASSWORD3 = "HLMS";
+String aPASSWORD3 = "HLMSF";
 bool showINPUT3 = true;
 int pressed3 = 0;
 

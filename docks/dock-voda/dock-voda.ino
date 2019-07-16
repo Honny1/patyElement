@@ -38,7 +38,7 @@ Servo senzorServo;
 #define Password_Lenght 5
 char Data[Password_Lenght];
 char Master[Password_Lenght] = "3832";
-char Master1[Password_Lenght] = "4279";
+char Master1[Password_Lenght] = "4879";
 byte data_count = 0, master_count = 0;
 bool Pass_is_good;
 char customKey;
