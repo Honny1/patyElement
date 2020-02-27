@@ -27,7 +27,7 @@ LiquidCrystal_I2C lcd(0x27, 20, 4);
 
 /*
  * voda - DQST - I
- * ohen - DGIX - C
+ * ohen - DGLX - C
  * vzduch - AELW - H
  * zeme - HLMS - F
  */
@@ -59,7 +59,7 @@ String pass1 = "";
 int lenPass1 = 0;
 bool wait1 = false;
 String PASSWORD1 = "DGIX";
-String aPASSWORD1 = "DGIXC";
+String aPASSWORD1 = "DGLXC";
 bool showINPUT1 = true;
 int pressed1 = 0;
 
