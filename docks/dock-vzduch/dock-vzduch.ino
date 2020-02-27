@@ -118,7 +118,7 @@ void setup() {
   attachInterrupt(pinPreruseni, prictiPulz, FALLING);
   pinMode(pinCLK, INPUT);
   pinMode(pinDT, INPUT);
-  pinMode(pinSW, INPUT);
+  pinMode(pinSW, INPUT_PULLUP);
   /*------------------------------------*/
   TT.start();
 } //start rtOS
@@ -203,7 +203,10 @@ void task2() {
       pass = "";
       poziceEnkod = 0;
     }
-
+/*
+lenPass=4;
+pass="5723";
+*/
     if (lenPass > 3) {
       Serial.print(pass);
       if (pass == "5723") {
