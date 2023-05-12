@@ -201,7 +201,7 @@ void sevoOpen(int data) {
       keyServo.write(0);
       break;
     case 2:
-      senzorServo.write(0);
+      senzorServo.write(100);
       break;
   }
 }

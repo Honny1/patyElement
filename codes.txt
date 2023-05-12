@@ -5,7 +5,7 @@
 VODA:
     -keyPadPin: 3832
     -stonePass: dqst
-    -senzorPin: 8756
+    -senzorPin: 4879
 OHEN:
     -keyPadPin: 5742
     -stonePass: cfjv

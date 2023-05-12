@@ -129,14 +129,14 @@ void task0() {
   if (openKey) {
     customKey = customKeypad.getKey();
     if (customKey) {
+      Serial.println(customKey);
       Data[data_count] = customKey;
       data_count++;
       if (customKey == '*') {
         clearData();
       }
     }
-    Serial.println(Data);
-  
+    
     if (data_count == Password_Lenght - 1) {
       if (!strcmp(Data, Master)) {
         dataCode = 'E';
@@ -176,11 +176,12 @@ void task2() {
       }
     }
     stavPred = stavCLK;
-    Serial.println("aaa");
+    Serial.println("pozice:");
     Serial.println(poziceEnkod);
+    Serial.println("pass:");
     Serial.println(pass);
 
-    stavSW = analogRead(pinSW);
+    stavSW = digitalRead(pinSW);
     Serial.println(stavSW);
     //delay(500);
     Serial.println(pres);

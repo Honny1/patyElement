@@ -109,10 +109,12 @@ void setup() {
 void task0() {
   customKey = customKeypad.getKey();
   if (customKey) {
+    Serial.println(customKey);
     Data[data_count] = customKey;
     data_count++;
     if (customKey == '*') {
       clearData();
+      Serial.println("clear data");
     }
   }
   if (data_count == Password_Lenght - 1) {
@@ -151,6 +153,7 @@ void task3() {
     digitalWrite(pinNapajeni, HIGH);
     int analog = analogRead(pinAnalog);
     digitalWrite(pinNapajeni, LOW);
+    Serial.println(analog);
     if (analog > 512) {
       showPass = true;
     } else {
